@@ -1,0 +1,65 @@
+<form name="OdebranieDecyzji">
+	<div class="form-group">
+		<label for="nrAlbumu">Numer albumu</label> 
+		<input class="form-control"
+			cam-variable-type="String" 
+			cam-variable-name="podanie_nrAlbumu"
+			name="nrAlbumu" 
+			readonly="true" />
+	</div>
+	<div class="form-group">
+		<label for="punktyECTS">Punkty ECTS</label> 
+		<input
+			class="form-control" 
+			cam-variable-type="Integer"
+			cam-variable-name="podanie_punktyECTS" 
+			name="punktyECTS"
+			readonly="true" />
+	</div>
+	<div class="form-group">
+		<label for="uzasadnienie">Uzasadnienie</label> 
+		<input
+			class="form-control" 
+			cam-variable-type="String"
+			cam-variable-name="podanie_uzasadnienie" 
+			name="uzasadnienie"
+			readonly="true" />
+	</div>
+
+	<div class="form-group">
+		<label for="czyPozytywna">Czy pozytywna?</label> 
+		<input
+			class="form-control" 
+			cam-variable-type="Boolean"
+			cam-variable-name="decyzja_czyPozytywna" 
+			name="czyPozytywna"
+			readonly="true" />
+	</div>
+	<div class="form-group">
+		<label for="uzasadnienieDecyzji">Uzasadnienie decyzji</label>
+		<input
+			class="form-control" 
+			cam-variable-type="String"
+			cam-variable-name="decyzja_uzasadnienie" 
+			name="uzasadnienieDecyzji"
+			readonly="true" />
+	</div>
+	<div class="form-group">
+		<label for="oplataStatus">Status płatności</label>
+		<input
+			class="form-control" 
+			cam-variable-type="String"
+			cam-variable-name="oplata_status" 
+			name="oplataStatus"
+			readonly="true" />
+	</div>	
+	<div class="form-group">
+		<label for="czyOdwolanie">Czy odwołanie?</label>
+		<input
+			class="form-control" 
+			cam-variable-type="Boolean"
+			cam-variable-name="czyOdwolanie" 
+			name="czyOdwolanie"
+			 />
+	</div>	
+</form>

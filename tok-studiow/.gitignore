@@ -1,0 +1,7 @@
+target
+*.log
+.classpath
+.settings
+.project
+.gwt
+build

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.2">
+  <bpmn:message id="odwolanieMsgId" name="odwolanieMsg" />
+  <bpmn:message id="wynikodwolaniaMsgId" name="wynikodwolaniaMsg" />
+  <bpmn:process id="Odwolanie" name="Odwołanie" isExecutable="true">
+    <bpmn:startEvent id="StartOdwolanieId">
+      <bpmn:outgoing>SequenceFlow_start_fork</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="odwolanieMsgId" />
+    </bpmn:startEvent>
+    <bpmn:endEvent id="EndOdwolanieId">
+      <bpmn:incoming>SequenceFlow_join_end</bpmn:incoming>
+      <bpmn:messageEventDefinition messageRef="wynikodwolaniaMsgId" camunda:class="pl.dziekanat.tokstudiow.OdwolanieCallback" />
+    </bpmn:endEvent>
+    <bpmn:parallelGateway id="ForkGateway">
+      <bpmn:incoming>SequenceFlow_start_fork</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_fork_rektor</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_fork_dziekan</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_start_fork" sourceRef="StartOdwolanieId" targetRef="ForkGateway" />
+    <bpmn:sequenceFlow id="SequenceFlow_join_end" sourceRef="JoinGateway" targetRef="EndOdwolanieId" />
+    <bpmn:sequenceFlow id="SequenceFlow_fork_rektor" sourceRef="ForkGateway" targetRef="IntermediateThrowEvent_0317j2t" />
+    <bpmn:scriptTask id="Task_1joeqw6" name="Pozytywna decyzja Rektora&#10;&#10;" camunda:resultVariable="decyzja_czyPozytywna">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="decyzja_uzasadnienie"><![CDATA[${'Pozytywna decyzja Rektora.'}]]></camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_rektor_decyzja</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_decyzjaRektora_join</bpmn:outgoing>
+      <bpmn:script>${true}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_rektor_decyzja" sourceRef="IntermediateThrowEvent_0317j2t" targetRef="Task_1joeqw6" />
+    <bpmn:sequenceFlow id="SequenceFlow_decyzjaRektora_join" sourceRef="Task_1joeqw6" targetRef="JoinGateway" />
+    <bpmn:intermediateCatchEvent id="IntermediateThrowEvent_13l7pvc" name="DziekanMyśli">
+      <bpmn:incoming>SequenceFlow_fork_dziekan</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_dziekan_decyzja</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT3S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:scriptTask id="Task_0p5t1at" name="Negatywna decyzja Dziekana" camunda:resultVariable="decyzja_czyPozytywna">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="decyzja_uzasadnienie"><![CDATA[${'Decyzja negatywna podtrzymana przez Dziekana.'}]]></camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_dziekan_decyzja</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_decyzjaDziekana_join</bpmn:outgoing>
+      <bpmn:script>${false}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_fork_dziekan" sourceRef="ForkGateway" targetRef="IntermediateThrowEvent_13l7pvc" />
+    <bpmn:sequenceFlow id="SequenceFlow_dziekan_decyzja" sourceRef="IntermediateThrowEvent_13l7pvc" targetRef="Task_0p5t1at" />
+    <bpmn:sequenceFlow id="SequenceFlow_decyzjaDziekana_join" sourceRef="Task_0p5t1at" targetRef="JoinGateway" />
+    <bpmn:intermediateCatchEvent id="IntermediateThrowEvent_0317j2t" name="RektorMyśli">
+      <bpmn:incoming>SequenceFlow_fork_rektor</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_rektor_decyzja</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT3S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:parallelGateway id="JoinGateway">
+      <bpmn:incoming>SequenceFlow_decyzjaDziekana_join</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_decyzjaRektora_join</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_join_end</bpmn:outgoing>
+    </bpmn:parallelGateway>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Odwolanie">
+      <bpmndi:BPMNShape id="StartEvent_1l4tcgv_di" bpmnElement="StartOdwolanieId">
+        <dc:Bounds x="37" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-35" y="138" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0tbwqbd_di" bpmnElement="EndOdwolanieId">
+        <dc:Bounds x="752" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="769.963" y="141" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_027e5re_di" bpmnElement="ForkGateway">
+        <dc:Bounds x="257" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281.96299999999997" y="148" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0109uds_di" bpmnElement="SequenceFlow_start_fork">
+        <di:waypoint xsi:type="dc:Point" x="73" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="257" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="120" y="98.5" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_00qmyn3_di" bpmnElement="SequenceFlow_join_end">
+        <di:waypoint xsi:type="dc:Point" x="705" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="752" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="684" y="99" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1tbg05j_di" bpmnElement="SequenceFlow_fork_rektor">
+        <di:waypoint xsi:type="dc:Point" x="282" y="95" />
+        <di:waypoint xsi:type="dc:Point" x="282" y="31" />
+        <di:waypoint xsi:type="dc:Point" x="362" y="31" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="290" y="57" width="16" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0u3d750_di" bpmnElement="Task_1joeqw6">
+        <dc:Bounds x="486" y="-9" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0nvftsd_di" bpmnElement="SequenceFlow_rektor_decyzja">
+        <di:waypoint xsi:type="dc:Point" x="398" y="31" />
+        <di:waypoint xsi:type="dc:Point" x="486" y="31" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="397" y="9.5" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0xg9m74_di" bpmnElement="SequenceFlow_decyzjaRektora_join">
+        <di:waypoint xsi:type="dc:Point" x="586" y="31" />
+        <di:waypoint xsi:type="dc:Point" x="680" y="31" />
+        <di:waypoint xsi:type="dc:Point" x="680" y="95" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="588" y="10" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_0nvwktz_di" bpmnElement="IntermediateThrowEvent_13l7pvc">
+        <dc:Bounds x="362" y="175" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="348" y="213" width="65" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_1y37903_di" bpmnElement="Task_0p5t1at">
+        <dc:Bounds x="486" y="153" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1utol2w_di" bpmnElement="SequenceFlow_fork_dziekan">
+        <di:waypoint xsi:type="dc:Point" x="282" y="145" />
+        <di:waypoint xsi:type="dc:Point" x="282" y="193" />
+        <di:waypoint xsi:type="dc:Point" x="362" y="193" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="297" y="162" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1cynbck_di" bpmnElement="SequenceFlow_dziekan_decyzja">
+        <di:waypoint xsi:type="dc:Point" x="398" y="193" />
+        <di:waypoint xsi:type="dc:Point" x="442" y="193" />
+        <di:waypoint xsi:type="dc:Point" x="442" y="193" />
+        <di:waypoint xsi:type="dc:Point" x="486" y="193" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="457" y="186.5" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0vn2mon_di" bpmnElement="SequenceFlow_decyzjaDziekana_join">
+        <di:waypoint xsi:type="dc:Point" x="586" y="193" />
+        <di:waypoint xsi:type="dc:Point" x="680" y="193" />
+        <di:waypoint xsi:type="dc:Point" x="680" y="145" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="588" y="172" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_03ikcoo_di" bpmnElement="IntermediateThrowEvent_0317j2t">
+        <dc:Bounds x="362" y="13" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="354" y="51" width="58" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_0mp849x_di" bpmnElement="JoinGateway">
+        <dc:Bounds x="655" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="590" y="148" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
